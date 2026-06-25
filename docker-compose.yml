@@ -1,0 +1,9 @@
+services:
+  clingo:
+    build: .
+    container_name: clingo-web
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - JAVA_OPTS=-Xmx256m -Xms64m
