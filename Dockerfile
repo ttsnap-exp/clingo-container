@@ -10,8 +10,8 @@ RUN apk add --no-cache maven \
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Install Clingo from Alpine community repo
-RUN apk add --no-cache gringo
+# Enable Alpine community repo and install clingo
+RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community clingo
 
 COPY --from=builder /app/target/clingo-container-1.0.0.jar app.jar
 
