@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: clingo-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clingo-server
+  namespace: clingo-server
+  labels:
+    app: clingo-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clingo-server
+  template:
+    metadata:
+      labels:
+        app: clingo-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+      containers:
+        - name: clingo-server
+          image: ttsnap/clingo-server:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clingo-server
+  namespace: clingo-server
+spec:
+  selector:
+    app: clingo-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
